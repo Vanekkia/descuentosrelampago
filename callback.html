@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok â€” AutorizaciÃ³n Completada</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0a0a0a; color: #e0e0e0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .card { background: #1a1a2e; border-radius: 16px; padding: 40px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+        h1 { font-size: 24px; margin-bottom: 16px; }
+        .success { color: #00f2ea; }
+        .error { color: #ff4757; }
+        .code-box { background: #16213e; border: 1px solid #0f3460; border-radius: 8px; padding: 16px; margin: 20px 0; word-break: break-all; font-family: 'Courier New', monospace; font-size: 14px; user-select: all; }
+        .instructions { color: #888; font-size: 14px; margin-top: 16px; line-height: 1.6; }
+        button { background: #00f2ea; color: #000; border: none; padding: 12px 24px; border-radius: 8px; font-size: 16px; cursor: pointer; margin-top: 12px; font-weight: 600; }
+        button:hover { background: #00d4ce; }
+        .copied { background: #2ed573 !important; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div id="loading">
+            <h1>Procesando autorizaciÃ³n...</h1>
+        </div>
+        <div id="result" style="display:none;"></div>
+    </div>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get('code');
+        const error = params.get('error');
+        const state = params.get('state');
+        const resultDiv = document.getElementById('result');
+        const loadingDiv = document.getElementById('loading');
+
+        loadingDiv.style.display = 'none';
+        resultDiv.style.display = 'block';
+
+        if (error) {
+            resultDiv.innerHTML = `
+                <h1 class="error">âŒ Error de autorizaciÃ³n</h1>
+                <p>${params.get('error_description') || error}</p>
+            `;
+        } else if (code) {
+            resultDiv.innerHTML = `
+                <h1 class="success">âœ… Â¡AutorizaciÃ³n exitosa!</h1>
+                <p>Copia este cÃ³digo y pÃ©galo en el dashboard:</p>
+                <div class="code-box" id="codeBox">${code}</div>
+                <button onclick="copyCode()">ðŸ“‹ Copiar cÃ³digo</button>
+                <p class="instructions">
+                    Ve a tu dashboard â†’ pestaÃ±a TikTok â†’ pega el cÃ³digo.<br>
+                    Este cÃ³digo expira en unos minutos.
+                </p>
+            `;
+        } else {
+            resultDiv.innerHTML = `
+                <h1 class="error">âŒ No se recibiÃ³ cÃ³digo</h1>
+                <p>Intenta conectar de nuevo desde el dashboard.</p>
+            `;
+        }
+
+        function copyCode() {
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = document.querySelector('button');
+                btn.textContent = 'âœ… Â¡Copiado!';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = 'ðŸ“‹ Copiar cÃ³digo'; btn.classList.remove('copied'); }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
